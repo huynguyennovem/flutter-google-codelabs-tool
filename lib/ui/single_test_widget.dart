@@ -1,0 +1,116 @@
+import 'dart:async';
+
+import 'package:dartz/dartz.dart' as dartz;
+import 'package:flutter/material.dart';
+import 'package:flutter_google_codelabs_tool/data/api_service.dart';
+import 'package:flutter_google_codelabs_tool/di/di.dart';
+import 'package:flutter_google_codelabs_tool/ui/result_table_widget.dart';
+import 'package:flutter_google_codelabs_tool/util/extension.dart';
+import 'package:flutter_google_codelabs_tool/util/styles.dart';
+
+import '../entity/api_error.dart';
+import '../entity/badge.dart';
+
+class SingleTestWidget extends StatefulWidget {
+  const SingleTestWidget({Key? key}) : super(key: key);
+
+  @override
+  State<SingleTestWidget> createState() => _SingleTestWidgetState();
+}
+
+class _SingleTestWidgetState extends State<SingleTestWidget> {
+  final _inputPublicProfileUrl = TextEditingController();
+  Future? _badgeFuture;
+  StreamSubscription? _badgeSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _inputPublicProfileUrl.text =
+        'https://www.cloudskillsboost.google/public_profiles/48f6fc57-ef42-47e1-90cb-7c6e59569939';
+    _onPressStart();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Single test'),
+      ),
+      body: Container(
+        margin: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            const SizedBox(height: 32.0),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      hintText: 'Profile url',
+                      border: OutlineInputBorder(),
+                    ),
+                    controller: _inputPublicProfileUrl,
+                  ),
+                ),
+                const SizedBox(width: 16.0),
+                SizedBox(
+                  width: 96.0,
+                  height: 48.0,
+                  child: OutlinedButton(
+                    style: CommonButtonStyle.buttonStyleNormal,
+                    onPressed: () => _onPressStart(),
+                    child: Text(
+                      'Start',
+                      style: CommonTextStyle.textStyleNormal.copyWith(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 32.0),
+            FutureBuilder(
+              future: _badgeFuture,
+              builder: (context, snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.waiting:
+                    return const CircularProgressIndicator();
+                  case ConnectionState.done:
+                    final value = snapshot.data as dartz.Either<ApiError, List<Badge>>;
+                    final badges = value.asRight();
+                    return ResultTable(badges: badges);
+                  default:
+                    if (snapshot.hasError) {
+                      return const Center(
+                        child: Text('Something was wrong'),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _onPressStart() {
+    final url = _inputPublicProfileUrl.text;
+    if (url.isEmpty) return;
+    try {
+      _badgeSubscription?.cancel(); // cancel in-progressing future
+      setState(() {
+        _badgeFuture = getIt.get<ApiService>().getAllBadges(url);
+        _badgeSubscription = _badgeFuture?.asStream().listen((data) {
+          final temp = data as dartz.Right<ApiError, List<Badge>>;
+          for (var element in temp.value) {
+            debugPrint(element.toString());
+          }
+        });
+      });
+    } catch (e) {
+      debugPrint('Error when parsing badge info ${e.toString()}');
+    }
+  }
+}
