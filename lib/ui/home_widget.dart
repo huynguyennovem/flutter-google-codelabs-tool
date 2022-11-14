@@ -17,9 +17,9 @@ class _HomeWidgetState extends State<HomeWidget> {
   Widget build(BuildContext context) {
     return BottomNavigationBarTheme(
       data: const BottomNavigationBarThemeData(
-        unselectedItemColor: Colors.black,
-        selectedItemColor: Colors.red,
-        backgroundColor: Colors.blueGrey,
+        unselectedItemColor: Colors.lightBlueAccent,
+        selectedItemColor: Colors.white,
+        backgroundColor: Colors.blue,
       ),
       child: AdaptiveScaffold(
         smallBreakpoint: const WidthPlatformBreakpoint(end: 700),
@@ -40,7 +40,7 @@ class _HomeWidgetState extends State<HomeWidget> {
         body: (_) {
           switch (_navigationIndex) {
             case 0:
-              return const SingleTestWidget();
+              return const FinalResultWidget();
             case 1:
               return const SingleTestWidget();
           }

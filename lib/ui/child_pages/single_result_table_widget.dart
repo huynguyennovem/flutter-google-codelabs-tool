@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_google_codelabs_tool/entity/badge.dart';
 import 'package:flutter_google_codelabs_tool/ui/others/table_row_item.dart';
 import 'package:flutter_google_codelabs_tool/util/extension.dart';
 import 'package:flutter_google_codelabs_tool/util/styles.dart';
 
-import '../entity/badge.dart';
-
-class ResultTable extends StatefulWidget {
-  const ResultTable({Key? key, required this.badges}) : super(key: key);
+class SingleResultTable extends StatefulWidget {
+  const SingleResultTable({Key? key, required this.badges}) : super(key: key);
 
   final List<Badge> badges;
 
   @override
-  State<ResultTable> createState() => _ResultTableState();
+  State<SingleResultTable> createState() => _SingleResultTableState();
 }
 
-class _ResultTableState extends State<ResultTable> {
+class _SingleResultTableState extends State<SingleResultTable> {
   @override
   Widget build(BuildContext context) {
     return Container(

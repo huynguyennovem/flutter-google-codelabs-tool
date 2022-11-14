@@ -1,4 +1,15 @@
+import 'dart:async';
+
+import 'package:dartz/dartz.dart' as dartz;
 import 'package:flutter/material.dart';
+import 'package:flutter_google_codelabs_tool/data/api_service.dart';
+import 'package:flutter_google_codelabs_tool/di/di.dart';
+import 'package:flutter_google_codelabs_tool/entity/api_error.dart';
+import 'package:flutter_google_codelabs_tool/entity/participant.dart';
+import 'package:flutter_google_codelabs_tool/ui/child_pages/final_result_table_widget.dart';
+import 'package:flutter_google_codelabs_tool/ui/others/error_widget.dart';
+import 'package:flutter_google_codelabs_tool/util/extension.dart';
+import 'package:flutter_google_codelabs_tool/util/styles.dart';
 
 class FinalResultWidget extends StatefulWidget {
   const FinalResultWidget({Key? key}) : super(key: key);
@@ -8,10 +19,104 @@ class FinalResultWidget extends StatefulWidget {
 }
 
 class _FinalResultWidgetState extends State<FinalResultWidget> {
+  final _appScriptUrl = TextEditingController();
+  Future? _finalDataFuture;
+  StreamSubscription? _finalDataSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _appScriptUrl.text =
+        'https://script.google.com/macros/s/AKfycbyw8RJ5pU_nTDNWdKGmg9SC4dnsiHrvIcI8ULBCh1lJVnQJmAhJPKwqv9q6dyBKlmY/exec';
+    _onPressStart();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Text('Final result'),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Final result'),
+      ),
+      body: Container(
+        margin: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            const SizedBox(height: 32.0),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      hintText: 'GoogleSheet result file url',
+                      border: OutlineInputBorder(),
+                    ),
+                    controller: _appScriptUrl,
+                  ),
+                ),
+                const SizedBox(width: 16.0),
+                SizedBox(
+                  width: 96.0,
+                  height: 48.0,
+                  child: OutlinedButton(
+                    style: CommonButtonStyle.buttonStyleNormal,
+                    onPressed: () => _onPressStart(),
+                    child: Text(
+                      'Start',
+                      style: CommonTextStyle.textStyleNormal.copyWith(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 32.0),
+            FutureBuilder(
+              future: _finalDataFuture,
+              builder: (context, snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.waiting:
+                    return const CircularProgressIndicator();
+                  case ConnectionState.done:
+                    if (snapshot.data is dartz.Left<ApiError, List<Participant>>) {
+                      debugPrint(snapshot.data.value.toString());
+                      return const CustomErrorWidget();
+                    }
+                    final value = snapshot.data as dartz.Either<ApiError, List<Participant>>;
+                    final participants = value.asRight();
+                    return Flexible(child: FinalResultTable(participants: participants));
+                  default:
+                    if (snapshot.hasError) {
+                      return const CustomErrorWidget();
+                    }
+                    return const SizedBox.shrink();
+                }
+              },
+            ),
+          ],
+        ),
+      ),
     );
+  }
+
+  _onPressStart() {
+    final url = _appScriptUrl.text;
+    if (url.isEmpty) return;
+    try {
+      _finalDataSubscription?.cancel();
+      setState(() {
+        _finalDataFuture = getIt.get<ApiService>().getFinalResult(url);
+        _finalDataSubscription = _finalDataFuture?.asStream().listen((data) {
+          if (data is dartz.Left<ApiError, List<Participant>>) {
+            debugPrint(data.value.toString());
+            return;
+          }
+          final temp = data as dartz.Right<ApiError, List<Participant>>;
+          for (var element in temp.value) {
+            debugPrint(element.toString());
+          }
+        });
+      });
+    } catch (e) {
+      debugPrint('Error when parsing final result from AppScript data ${e.toString()}');
+    }
   }
 }

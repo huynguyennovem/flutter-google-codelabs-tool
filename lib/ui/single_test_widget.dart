@@ -4,12 +4,12 @@ import 'package:dartz/dartz.dart' as dartz;
 import 'package:flutter/material.dart';
 import 'package:flutter_google_codelabs_tool/data/api_service.dart';
 import 'package:flutter_google_codelabs_tool/di/di.dart';
-import 'package:flutter_google_codelabs_tool/ui/result_table_widget.dart';
+import 'package:flutter_google_codelabs_tool/entity/api_error.dart';
+import 'package:flutter_google_codelabs_tool/entity/badge.dart';
+import 'package:flutter_google_codelabs_tool/ui/child_pages/single_result_table_widget.dart';
+import 'package:flutter_google_codelabs_tool/ui/others/error_widget.dart';
 import 'package:flutter_google_codelabs_tool/util/extension.dart';
 import 'package:flutter_google_codelabs_tool/util/styles.dart';
-
-import '../entity/api_error.dart';
-import '../entity/badge.dart';
 
 class SingleTestWidget extends StatefulWidget {
   const SingleTestWidget({Key? key}) : super(key: key);
@@ -76,14 +76,16 @@ class _SingleTestWidgetState extends State<SingleTestWidget> {
                   case ConnectionState.waiting:
                     return const CircularProgressIndicator();
                   case ConnectionState.done:
+                    if (snapshot.data is dartz.Left<ApiError, List<Badge>>) {
+                      debugPrint(snapshot.data.value.toString());
+                      return const CustomErrorWidget();
+                    }
                     final value = snapshot.data as dartz.Either<ApiError, List<Badge>>;
                     final badges = value.asRight();
-                    return ResultTable(badges: badges);
+                    return Flexible(child: SingleResultTable(badges: badges));
                   default:
                     if (snapshot.hasError) {
-                      return const Center(
-                        child: Text('Something was wrong'),
-                      );
+                      return const CustomErrorWidget();
                     }
                     return const SizedBox.shrink();
                 }
@@ -103,6 +105,10 @@ class _SingleTestWidgetState extends State<SingleTestWidget> {
       setState(() {
         _badgeFuture = getIt.get<ApiService>().getAllBadges(url);
         _badgeSubscription = _badgeFuture?.asStream().listen((data) {
+          if (data is dartz.Left<ApiError, List<Badge>>) {
+            debugPrint(data.value.toString());
+            return;
+          }
           final temp = data as dartz.Right<ApiError, List<Badge>>;
           for (var element in temp.value) {
             debugPrint(element.toString());

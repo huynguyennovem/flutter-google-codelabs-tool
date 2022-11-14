@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:dartz/dartz.dart';
+import 'package:flutter_google_codelabs_tool/entity/participant.dart';
+import 'package:flutter_google_codelabs_tool/util/extension.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -30,6 +34,23 @@ class ApiService{
         return badge;
       }).toList();
       return Right(badges);
+    }
+    return const Left(ApiError.empty());
+  }
+
+  Future<Either<ApiError, List<Participant>>> getFinalResult(String appScriptUrl) async {
+    final response = await http.get(Uri.parse(appScriptUrl));
+    if (response.statusCode == 200) {
+      final rawListData = jsonDecode(response.body) as List;
+      var participantList = rawListData.map((e) => Participant.fromJson(e)).toList();
+
+      // get Badge info for each participant
+      for (var p in participantList){
+        final rs = await getAllBadges(p.publicProfile);
+        final badges = rs.asRight();
+        participantList[participantList.indexOf(p)] = p.copyWith(badges: badges);
+      }
+      return Right(participantList);
     }
     return const Left(ApiError.empty());
   }

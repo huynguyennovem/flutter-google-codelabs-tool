@@ -11,4 +11,9 @@ extension DateTimeFormat on DateTime {
     final formatter = DateFormat('MMM d yyyy');
     return formatter.format(this);
   }
+
+  get toFullDateTime {
+    final formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
+    return formatter.format(this);
+  }
 }

@@ -10,7 +10,7 @@ class CommonTextStyle {
 
   static const textStyleHeader = TextStyle(
     color: Colors.black54,
-    fontSize: 18.0,
+    fontSize: 16.0,
     fontStyle: FontStyle.normal,
     fontWeight: FontWeight.w500,
   );
