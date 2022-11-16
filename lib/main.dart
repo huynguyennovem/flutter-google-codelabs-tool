@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_google_codelabs_tool/provider/participant_provider.dart';
+import 'package:provider/provider.dart';
 
 import 'di/di.dart';
 import 'ui/home_widget.dart';
@@ -13,12 +15,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Google codelabs tool',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => ParticipantProvider()),
+      ],
+      child: MaterialApp(
+        title: 'Google codelabs tool',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: const HomeWidget(),
       ),
-      home: const HomeWidget(),
     );
   }
 }

@@ -6,10 +6,12 @@ import 'package:flutter_google_codelabs_tool/data/api_service.dart';
 import 'package:flutter_google_codelabs_tool/di/di.dart';
 import 'package:flutter_google_codelabs_tool/entity/api_error.dart';
 import 'package:flutter_google_codelabs_tool/entity/participant.dart';
+import 'package:flutter_google_codelabs_tool/provider/participant_provider.dart';
 import 'package:flutter_google_codelabs_tool/ui/child_pages/final_result_table_widget.dart';
 import 'package:flutter_google_codelabs_tool/ui/others/error_widget.dart';
 import 'package:flutter_google_codelabs_tool/util/extension.dart';
 import 'package:flutter_google_codelabs_tool/util/styles.dart';
+import 'package:provider/provider.dart';
 
 class FinalResultWidget extends StatefulWidget {
   const FinalResultWidget({Key? key}) : super(key: key);
@@ -42,33 +44,8 @@ class _FinalResultWidgetState extends State<FinalResultWidget> {
         child: Column(
           children: [
             const SizedBox(height: 32.0),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      hintText: 'GoogleSheet result file url',
-                      border: OutlineInputBorder(),
-                    ),
-                    controller: _appScriptUrl,
-                  ),
-                ),
-                const SizedBox(width: 16.0),
-                SizedBox(
-                  width: 96.0,
-                  height: 48.0,
-                  child: OutlinedButton(
-                    style: CommonButtonStyle.buttonStyleNormal,
-                    onPressed: () => _onPressStart(),
-                    child: Text(
-                      'Start',
-                      style: CommonTextStyle.textStyleNormal.copyWith(color: Colors.white),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 32.0),
+            _buildInputField(),
+            const SizedBox(height: 28.0),
             FutureBuilder(
               future: _finalDataFuture,
               builder: (context, snapshot) {
@@ -80,9 +57,7 @@ class _FinalResultWidgetState extends State<FinalResultWidget> {
                       debugPrint(snapshot.data.value.toString());
                       return const CustomErrorWidget();
                     }
-                    final value = snapshot.data as dartz.Either<ApiError, List<Participant>>;
-                    final participants = value.asRight();
-                    return Flexible(child: FinalResultTable(participants: participants));
+                    return const Flexible(child: FinalResultTable());
                   default:
                     if (snapshot.hasError) {
                       return const CustomErrorWidget();
@@ -97,7 +72,36 @@ class _FinalResultWidgetState extends State<FinalResultWidget> {
     );
   }
 
-  _onPressStart() {
+  _buildInputField() {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            decoration: const InputDecoration(
+              hintText: 'GoogleSheet result file url',
+              border: OutlineInputBorder(),
+            ),
+            controller: _appScriptUrl,
+          ),
+        ),
+        const SizedBox(width: 16.0),
+        SizedBox(
+          width: 96.0,
+          height: 48.0,
+          child: OutlinedButton(
+            style: CommonButtonStyle.buttonStyleNormal,
+            onPressed: () => _onPressStart(),
+            child: Text(
+              'Start',
+              style: CommonTextStyle.textStyleNormal.copyWith(color: Colors.white),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  _onPressStart() async {
     final url = _appScriptUrl.text;
     if (url.isEmpty) return;
     try {
@@ -105,14 +109,20 @@ class _FinalResultWidgetState extends State<FinalResultWidget> {
       setState(() {
         _finalDataFuture = getIt.get<ApiService>().getFinalResult(url);
         _finalDataSubscription = _finalDataFuture?.asStream().listen((data) {
+          // logging only
           if (data is dartz.Left<ApiError, List<Participant>>) {
             debugPrint(data.value.toString());
             return;
           }
-          final temp = data as dartz.Right<ApiError, List<Participant>>;
-          for (var element in temp.value) {
+          final participants = data as dartz.Right<ApiError, List<Participant>>;
+          for (var element in participants.value) {
             debugPrint(element.toString());
           }
+
+          // updating data in provider
+          context
+              .read<ParticipantProvider>()
+              .addAllParticipants(participants: participants.asRight());
         });
       });
     } catch (e) {
