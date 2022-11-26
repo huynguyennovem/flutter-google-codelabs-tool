@@ -26,9 +26,12 @@ class _SingleTestWidgetState extends State<SingleTestWidget> {
   @override
   void initState() {
     super.initState();
+
+    //TODO: remove this when releasing
     _inputPublicProfileUrl.text =
         'https://www.cloudskillsboost.google/public_profiles/48f6fc57-ef42-47e1-90cb-7c6e59569939';
     _onPressStart();
+    //TODO-END
   }
 
   @override

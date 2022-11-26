@@ -3,12 +3,14 @@ import 'dart:async';
 import 'package:dartz/dartz.dart' as dartz;
 import 'package:flutter/material.dart';
 import 'package:flutter_google_codelabs_tool/data/api_service.dart';
+import 'package:flutter_google_codelabs_tool/data/local_data.dart';
 import 'package:flutter_google_codelabs_tool/di/di.dart';
 import 'package:flutter_google_codelabs_tool/entity/api_error.dart';
 import 'package:flutter_google_codelabs_tool/entity/participant.dart';
 import 'package:flutter_google_codelabs_tool/provider/participant_provider.dart';
 import 'package:flutter_google_codelabs_tool/ui/child_pages/final_result_table_widget.dart';
 import 'package:flutter_google_codelabs_tool/ui/others/error_widget.dart';
+import 'package:flutter_google_codelabs_tool/util/constant.dart';
 import 'package:flutter_google_codelabs_tool/util/extension.dart';
 import 'package:flutter_google_codelabs_tool/util/styles.dart';
 import 'package:provider/provider.dart';
@@ -28,9 +30,12 @@ class _FinalResultWidgetState extends State<FinalResultWidget> {
   @override
   void initState() {
     super.initState();
+
+    //TODO: remove this when releasing
     _appScriptUrl.text =
         'https://script.google.com/macros/s/AKfycbyw8RJ5pU_nTDNWdKGmg9SC4dnsiHrvIcI8ULBCh1lJVnQJmAhJPKwqv9q6dyBKlmY/exec';
     _onPressStart();
+    //TODO-END
   }
 
   @override
@@ -107,7 +112,9 @@ class _FinalResultWidgetState extends State<FinalResultWidget> {
     try {
       _finalDataSubscription?.cancel();
       setState(() {
-        _finalDataFuture = getIt.get<ApiService>().getFinalResult(url);
+        _finalDataFuture = useDumpData
+            ? getIt.get<LocalData>().getFakeResult()
+            : getIt.get<ApiService>().getFinalResult(url);
         _finalDataSubscription = _finalDataFuture?.asStream().listen((data) {
           // logging only
           if (data is dartz.Left<ApiError, List<Participant>>) {
