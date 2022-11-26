@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_google_codelabs_tool/entity/badge.dart';
 import 'package:flutter_google_codelabs_tool/entity/participant.dart';
+import 'package:flutter_google_codelabs_tool/entity/sort/order_type.dart';
+import 'package:flutter_google_codelabs_tool/entity/sort/sort_type.dart';
+import 'package:flutter_google_codelabs_tool/entity/sort/sorter.dart';
 import 'package:flutter_google_codelabs_tool/provider/participant_provider.dart';
 import 'package:flutter_google_codelabs_tool/ui/others/clickable_text.dart';
 import 'package:flutter_google_codelabs_tool/ui/others/table_row_item.dart';
@@ -22,56 +25,143 @@ class _FinalResultTableState extends State<FinalResultTable> {
   @override
   Widget build(BuildContext context) {
     return Consumer<ParticipantProvider>(
-      builder: (BuildContext context, value, Widget? child) {
-        return Column(
-          children: [
-            Align(
-              alignment: Alignment.centerRight,
-              child: IconButton(
-                onPressed: () {
-
-                },
-                icon: const Icon(Icons.filter_alt),
-              ),
-            ),
-            const SizedBox(height: 8.0),
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black87, width: 1.5),
-                borderRadius: BorderRadius.circular(4.0),
-              ),
-              child: Scrollbar(
-                controller: _scrollController,
-                thumbVisibility: true,
-                thickness: 5.0,
-                radius: const Radius.circular(0.5),
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  scrollDirection: Axis.horizontal,
-                  child: Table(
-                    columnWidths: const {
-                      0: FixedColumnWidth(50),
-                      1: FixedColumnWidth(150),
-                      2: FixedColumnWidth(250),
-                      3: FixedColumnWidth(250),
-                      4: FixedColumnWidth(500),
-                      5: FixedColumnWidth(200),
-                      6: FixedColumnWidth(200),
-                      7: FixedColumnWidth(150),
-                    },
-                    border: const TableBorder(
-                      horizontalInside: BorderSide(color: Colors.black87),
-                      verticalInside: BorderSide(color: Colors.black87),
+      builder: (BuildContext context, ParticipantProvider provider, Widget? child) {
+        final currentSorter = provider.sorter;
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              Align(
+                alignment: Alignment.centerRight,
+                child: PopupMenuButton<Sorter>(
+                  icon: const Icon(Icons.filter_alt),
+                  itemBuilder: (context) => <PopupMenuEntry<Sorter>>[
+                    const PopupMenuItem<Sorter>(
+                      enabled: false,
+                      child: ListTile(
+                        leading: Icon(Icons.filter_list_alt),
+                        title: Text('ORDER BY'),
+                      ),
                     ),
-                    children: [
-                      _buildTableHeader(),
-                      ..._buildTableData(value.participants),
-                    ],
+                    PopupMenuItem<Sorter>(
+                      padding: EdgeInsets.zero,
+                      value: Sorter(
+                        sortType: SortType.submittedTime,
+                        orderType: currentSorter.orderType,
+                      ),
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(minWidth: 240),
+                        child: ListTile(
+                          mouseCursor: SystemMouseCursors.click,
+                          leading: const Icon(Icons.timelapse),
+                          trailing: _getTrailIconByOrder(
+                            currentSorter: currentSorter,
+                            menuSortType: SortType.submittedTime,
+                          ),
+                          title: const Text('Submitted time'),
+                          onTap: () {
+                            final newSorter = Sorter(
+                              sortType: SortType.submittedTime,
+                              orderType: currentSorter.orderType.switchOrderType,
+                            );
+                            _onSelectedSort(newSorter);
+                          },
+                        ),
+                      ),
+                    ),
+                    PopupMenuItem<Sorter>(
+                      padding: EdgeInsets.zero,
+                      value: Sorter(
+                        sortType: SortType.fullName,
+                        orderType: currentSorter.orderType,
+                      ),
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(minWidth: 240),
+                        child: ListTile(
+                          mouseCursor: SystemMouseCursors.click,
+                          leading: const Icon(Icons.person),
+                          trailing: _getTrailIconByOrder(
+                            currentSorter: currentSorter,
+                            menuSortType: SortType.fullName,
+                          ),
+                          title: const Text('Name'),
+                          onTap: () {
+                            final newSorter = Sorter(
+                              sortType: SortType.fullName,
+                              orderType: currentSorter.orderType.switchOrderType,
+                            );
+                            _onSelectedSort(newSorter);
+                          },
+                        ),
+                      ),
+                    ),
+                    PopupMenuItem<Sorter>(
+                      padding: EdgeInsets.zero,
+                      value: Sorter(
+                        sortType: SortType.numBadges,
+                        orderType: currentSorter.orderType,
+                      ),
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(minWidth: 240),
+                        child: ListTile(
+                          mouseCursor: SystemMouseCursors.click,
+                          leading: const Icon(Icons.badge),
+                          trailing: _getTrailIconByOrder(
+                            currentSorter: currentSorter,
+                            menuSortType: SortType.numBadges,
+                          ),
+                          title: const Text('Number of badges'),
+                          onTap: () {
+                            final newSorter = Sorter(
+                              sortType: SortType.numBadges,
+                              orderType: currentSorter.orderType.switchOrderType,
+                            );
+                            _onSelectedSort(newSorter);
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8.0),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black87, width: 1.5),
+                  borderRadius: BorderRadius.circular(4.0),
+                ),
+                child: Scrollbar(
+                  controller: _scrollController,
+                  thumbVisibility: true,
+                  thickness: 5.0,
+                  radius: const Radius.circular(0.5),
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    scrollDirection: Axis.horizontal,
+                    child: Table(
+                      columnWidths: const {
+                        0: FixedColumnWidth(50),
+                        1: FixedColumnWidth(100),
+                        2: FixedColumnWidth(250),
+                        3: FixedColumnWidth(200),
+                        4: FixedColumnWidth(300),
+                        5: FixedColumnWidth(150),
+                        6: FixedColumnWidth(400),
+                        7: FixedColumnWidth(150),
+                      },
+                      border: const TableBorder(
+                        horizontalInside: BorderSide(color: Colors.black87),
+                        verticalInside: BorderSide(color: Colors.black87),
+                      ),
+                      children: [
+                        _buildTableHeader(),
+                        ..._buildTableData(provider.participants),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       },
     );
@@ -82,16 +172,15 @@ class _FinalResultTableState extends State<FinalResultTable> {
       decoration: const BoxDecoration(color: Colors.blue),
       children: [
         TableRowItem(
-          child: Text('STT',
-              style: CommonTextStyle.textStyleHeader.copyWith(color: Colors.white)),
+          child: Text('STT', style: CommonTextStyle.textStyleHeader.copyWith(color: Colors.white)),
         ),
         TableRowItem(
           child: Text('Submitted time',
               style: CommonTextStyle.textStyleHeader.copyWith(color: Colors.white)),
         ),
         TableRowItem(
-          child: Text('Email',
-              style: CommonTextStyle.textStyleHeader.copyWith(color: Colors.white)),
+          child:
+              Text('Email', style: CommonTextStyle.textStyleHeader.copyWith(color: Colors.white)),
         ),
         TableRowItem(
           child: Text('Receive cert method',
@@ -176,5 +265,19 @@ class _FinalResultTableState extends State<FinalResultTable> {
             style: CommonTextStyle.textStyleNormal),
       ),
     ];
+  }
+
+  _getTrailIconByOrder({required Sorter currentSorter, required SortType menuSortType}) {
+    if (currentSorter.sortType != menuSortType) {
+      return const SizedBox.shrink();
+    }
+    return currentSorter.orderType == OrderType.desc
+        ? const Icon(Icons.vertical_align_bottom)
+        : const Icon(Icons.vertical_align_top);
+  }
+
+  void _onSelectedSort(Sorter sorter) {
+    context.read<ParticipantProvider>().sortParticipants(sorter: sorter);
+    Navigator.pop(context);
   }
 }

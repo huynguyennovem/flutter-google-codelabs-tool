@@ -7,13 +7,19 @@ extension EitherX<L, R> on Either<L, R> {
 }
 
 extension DateTimeFormat on DateTime {
-  get toSimpleDateTime {
+  String get toSimpleDateTime {
     final formatter = DateFormat('MMM d yyyy');
     return formatter.format(this);
   }
 
-  get toFullDateTime {
+  String get toFullDateTime {
     final formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
     return formatter.format(this);
   }
+}
+
+extension ListDataExtension<T> on List<T>? {
+  bool get notNullOrEmpty => this?.isNotEmpty == true;
+
+  bool get nullOrEmpty => this == null || this?.isEmpty == true;
 }
