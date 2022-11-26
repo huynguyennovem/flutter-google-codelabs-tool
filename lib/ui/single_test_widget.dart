@@ -24,16 +24,6 @@ class _SingleTestWidgetState extends State<SingleTestWidget> {
   StreamSubscription? _badgeSubscription;
 
   @override
-  void initState() {
-    super.initState();
-
-    //TODO: remove this when releasing
-    _inputPublicProfileUrl.text =
-        'https://www.cloudskillsboost.google/public_profiles/48f6fc57-ef42-47e1-90cb-7c6e59569939';
-    _onPressStart();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(

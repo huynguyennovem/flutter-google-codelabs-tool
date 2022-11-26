@@ -28,17 +28,6 @@ class _FinalResultWidgetState extends State<FinalResultWidget> {
   StreamSubscription? _finalDataSubscription;
 
   @override
-  void initState() {
-    super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      //TODO: remove this when releasing
-      _appScriptUrl.text = 'https://script.google.com/macros/s/AKfycbyw8RJ5pU_nTDNWdKGmg9SC4dnsiHrvIcI8ULBCh1lJVnQJmAhJPKwqv9q6dyBKlmY/exec';
-      _onPressStart();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
