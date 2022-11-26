@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:dartz/dartz.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_google_codelabs_tool/entity/api_error.dart';
 import 'package:flutter_google_codelabs_tool/entity/badge.dart';
 import 'package:flutter_google_codelabs_tool/entity/participant.dart';
@@ -19,6 +20,10 @@ class LocalData {
       participantList[participantList.indexOf(p)] = p.copyWith(badges: get3RandomBadges);
     }
     return Right(participantList);
+  }
+
+  Future<String> getGuideline() async {
+    return rootBundle.loadString('assets/GUIDELINE.md');
   }
 
 }

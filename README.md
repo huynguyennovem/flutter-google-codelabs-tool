@@ -1,5 +1,8 @@
 ### Introduction
-An opensource and a tool project that helps GDG organizers/Flutter trainers to perform operations the result of online codelabs event attendees.
+An opensource tool project which helps GDG organizers/Flutter trainers to parse result of online codelabs result.
+
+### How to use this tool
+1. 
 
 ### Packages & plugins
 - `flutter_adaptive_scaffold`: Adaptive layout with navigation menu (drawer, bottom bar). Using as main layout for this project
@@ -10,3 +13,4 @@ An opensource and a tool project that helps GDG organizers/Flutter trainers to p
 - `intl`: format datetime
 - `url_launcher`: support open url (profile page)
 - `provider`: as a state management. Using for storing and querying in-memory data
+- `flutter_markdown`: display nice guideline

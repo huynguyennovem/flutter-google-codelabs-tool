@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
+import 'package:flutter_google_codelabs_tool/ui/guideline_widget.dart';
 import 'package:flutter_google_codelabs_tool/ui/single_test_widget.dart';
 import 'package:flutter_google_codelabs_tool/ui/final_result_widget.dart';
 
@@ -29,6 +30,7 @@ class _HomeWidgetState extends State<HomeWidget> {
         destinations: const <NavigationDestination>[
           NavigationDestination(icon: Icon(Icons.home), label: 'Final result'),
           NavigationDestination(icon: Icon(Icons.looks_one_outlined), label: 'Single test'),
+          NavigationDestination(icon: Icon(Icons.book), label: 'Guideline'),
         ],
         onSelectedIndexChange: (p0) {
           if(_navigationIndex == p0) return;
@@ -43,6 +45,8 @@ class _HomeWidgetState extends State<HomeWidget> {
               return const FinalResultWidget();
             case 1:
               return const SingleTestWidget();
+            case 2:
+              return const GuidelineWidget();
           }
           return const SizedBox.shrink();
         },
