@@ -31,15 +31,11 @@ class _SingleTestWidgetState extends State<SingleTestWidget> {
     _inputPublicProfileUrl.text =
         'https://www.cloudskillsboost.google/public_profiles/48f6fc57-ef42-47e1-90cb-7c6e59569939';
     _onPressStart();
-    //TODO-END
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Single test'),
-      ),
       body: Container(
         margin: const EdgeInsets.all(16.0),
         child: Column(
@@ -50,7 +46,7 @@ class _SingleTestWidgetState extends State<SingleTestWidget> {
                 Expanded(
                   child: TextField(
                     decoration: const InputDecoration(
-                      hintText: 'Profile url',
+                      hintText: 'Public profile url',
                       border: OutlineInputBorder(),
                     ),
                     controller: _inputPublicProfileUrl,

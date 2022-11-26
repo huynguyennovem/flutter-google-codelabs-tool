@@ -15,8 +15,8 @@ class ClickableText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RichText(
-      text: TextSpan(
+    return SelectableText.rich(
+      TextSpan(
         text: text,
         style: textStyle ??
             TextStyle(

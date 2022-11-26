@@ -7,11 +7,11 @@ import 'ui/home_widget.dart';
 
 void main() {
   setupDI();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {

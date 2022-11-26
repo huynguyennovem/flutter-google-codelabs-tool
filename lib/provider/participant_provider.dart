@@ -10,18 +10,17 @@ class ParticipantProvider extends ChangeNotifier {
 
   List<Participant> get participants => _participants;
 
-  Sorter _sorter = Sorter.init();
+  Sorter _sorter = const Sorter.init();
 
   Sorter get sorter => _sorter;
 
-  void addParticipant({required Participant participant}) {
-    _participants.add(participant);
-    notifyListeners();
-  }
-
-  void addAllParticipants({required List<Participant> participants}) {
+  void addAllParticipants({required List<Participant> participants, bool useInitSorter = false}) {
     _participants.clear();
     _participants.addAll(participants);
+    if (useInitSorter) {
+      sortParticipants(sorter: const Sorter.init());
+      return;   // to prevent notifyListeners twice (already notified once in sortParticipants())
+    }
     notifyListeners();
   }
 
@@ -30,7 +29,7 @@ class ParticipantProvider extends ChangeNotifier {
     switch (sorter.sortType) {
       case SortType.submittedTime:
         _participants.sort((a, b) {
-          if (sorter.orderType == OrderType.desc) {
+          if (sorter.orderType == OrderType.asc) {
             return a.timeStamp.compareTo(b.timeStamp);
           } else {
             return b.timeStamp.compareTo(a.timeStamp);
@@ -38,7 +37,7 @@ class ParticipantProvider extends ChangeNotifier {
         });
         break;
       case SortType.fullName:
-        if (sorter.orderType == OrderType.desc) {
+        if (sorter.orderType == OrderType.asc) {
           _participants.sort((a, b) {
             if (a.badges.nullOrEmpty) {
               if (b.badges.nullOrEmpty) {
@@ -73,7 +72,7 @@ class ParticipantProvider extends ChangeNotifier {
         }
         break;
       case SortType.numBadges:
-        if (sorter.orderType == OrderType.desc) {
+        if (sorter.orderType == OrderType.asc) {
           _participants.sort((a, b) {
             if (a.badges.nullOrEmpty) {
               if (b.badges.nullOrEmpty) {

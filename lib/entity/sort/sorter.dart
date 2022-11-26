@@ -8,7 +8,7 @@ class Sorter extends Equatable {
 
   const Sorter({required this.sortType, required this.orderType});
 
-  Sorter.init()
+  const Sorter.init()
       : this(
     sortType: SortType.submittedTime,
     orderType: OrderType.desc,

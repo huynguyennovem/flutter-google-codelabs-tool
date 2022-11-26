@@ -1,7 +1,7 @@
 import 'package:flutter_google_codelabs_tool/entity/quest/quest.dart';
 import 'package:flutter_google_codelabs_tool/entity/quest/quest_stack.dart';
 
-const useDumpData = true;
+const useDumpData = String.fromEnvironment("data") == 'fake';
 
 final validQuests = List.from(const [
   Quest('Flutter Essential', QuestStack.flutter),

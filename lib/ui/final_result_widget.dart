@@ -31,19 +31,16 @@ class _FinalResultWidgetState extends State<FinalResultWidget> {
   void initState() {
     super.initState();
 
-    //TODO: remove this when releasing
-    _appScriptUrl.text =
-        'https://script.google.com/macros/s/AKfycbyw8RJ5pU_nTDNWdKGmg9SC4dnsiHrvIcI8ULBCh1lJVnQJmAhJPKwqv9q6dyBKlmY/exec';
-    _onPressStart();
-    //TODO-END
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      //TODO: remove this when releasing
+      _appScriptUrl.text = 'https://script.google.com/macros/s/AKfycbyw8RJ5pU_nTDNWdKGmg9SC4dnsiHrvIcI8ULBCh1lJVnQJmAhJPKwqv9q6dyBKlmY/exec';
+      _onPressStart();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Final result'),
-      ),
       body: Container(
         margin: const EdgeInsets.all(16.0),
         child: Column(
@@ -83,7 +80,7 @@ class _FinalResultWidgetState extends State<FinalResultWidget> {
         Expanded(
           child: TextField(
             decoration: const InputDecoration(
-              hintText: 'GoogleSheet result file url',
+              hintText: 'Google Apps Script - Web app url',
               border: OutlineInputBorder(),
             ),
             controller: _appScriptUrl,
@@ -129,7 +126,7 @@ class _FinalResultWidgetState extends State<FinalResultWidget> {
           // updating data in provider
           context
               .read<ParticipantProvider>()
-              .addAllParticipants(participants: participants.asRight());
+              .addAllParticipants(participants: participants.asRight(), useInitSorter: true);
         });
       });
     } catch (e) {

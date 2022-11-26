@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:dartz/dartz.dart';
 import 'package:flutter_google_codelabs_tool/entity/api_error.dart';
@@ -14,7 +15,7 @@ class LocalData {
     // get Badge info for each participant
     for (var p in participantList) {
       final randomData = DumpData().badges..shuffle();
-      final get3RandomBadges = randomData.take(3).toList();
+      final get3RandomBadges = randomData.take(Random().nextInt(5)).toList();
       participantList[participantList.indexOf(p)] = p.copyWith(badges: get3RandomBadges);
     }
     return Right(participantList);
