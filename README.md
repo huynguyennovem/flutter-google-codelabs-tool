@@ -8,16 +8,20 @@ This project is mainly supported on Web platform.
 
 2. Run project
 
-```shell
-flutter run -d chrome
-```
+	```shell
+	flutter run -d chrome
+	```
 
-**Note**: To run with dump data (pre-defined data in `lib/data/local_data.dart`):
-```shell
-flutter run -d chrome --dart-define data=fake
-```
+	**Note**: To run with dump data (pre-defined data in `lib/data/local_data.dart`):
+	```shell
+	flutter run -d chrome --dart-define data=fake
+	```
 
 3. _(Run with real data)_ Once you have **Google Apps Script** endpoint url, let's use it in `Final result` page
+
+### Demo
+
+https://user-images.githubusercontent.com/29337364/204084837-c7cd278d-9b2b-45d3-bb48-97bdba5a8b07.mp4
 
 ### Packages & plugins
 - `flutter_adaptive_scaffold`: Adaptive layout with navigation menu (drawer, bottom bar). Using as main layout for this project
