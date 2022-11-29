@@ -12,12 +12,21 @@ This project is mainly supported on Web platform.
 	flutter run -d chrome
 	```
 
-	**Note**: To run with dump data (pre-defined data in `lib/data/local_data.dart`):
+	**Note**: To run with dump data (pre-defined data in `lib/data/local_data.dart`) (this data is not really accurate, I recommend to use real data):
 	```shell
 	flutter run -d chrome --dart-define data=fake
 	```
 
 3. _(Run with real data)_ Once you have **Google Apps Script** endpoint url, let's use it in `Final result` page
+
+#### Commands in use
+
+- Code generation for entities (be used for some class like: `lib/entity/participant.dart`)
+```shell
+flutter pub run build_runner build
+```
+
+- Auto-fill App Script url on Final Result page by adding `--dart-define appscripturl=<APP_SCRIPT_URL>` to run args
 
 ### Demo
 

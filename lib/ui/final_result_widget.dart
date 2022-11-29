@@ -28,6 +28,16 @@ class _FinalResultWidgetState extends State<FinalResultWidget> {
   StreamSubscription? _finalDataSubscription;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      if(appScriptUrlFromEnv.isNotEmpty) {
+        _appScriptUrl.text = appScriptUrlFromEnv;
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
@@ -113,6 +123,7 @@ class _FinalResultWidgetState extends State<FinalResultWidget> {
           }
 
           // updating data in provider
+          if (!mounted) return;
           context
               .read<ParticipantProvider>()
               .addAllParticipants(participants: participants.asRight(), useInitSorter: true);

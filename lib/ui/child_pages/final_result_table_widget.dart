@@ -5,6 +5,7 @@ import 'package:flutter_google_codelabs_tool/entity/sort/order_type.dart';
 import 'package:flutter_google_codelabs_tool/entity/sort/sort_type.dart';
 import 'package:flutter_google_codelabs_tool/entity/sort/sorter.dart';
 import 'package:flutter_google_codelabs_tool/provider/participant_provider.dart';
+import 'package:flutter_google_codelabs_tool/ui/child_pages/award_filter_widget.dart';
 import 'package:flutter_google_codelabs_tool/ui/others/clickable_text.dart';
 import 'package:flutter_google_codelabs_tool/ui/others/table_row_item.dart';
 import 'package:flutter_google_codelabs_tool/util/extension.dart';
@@ -30,18 +31,47 @@ class _FinalResultTableState extends State<FinalResultTable> {
         return SingleChildScrollView(
           child: Column(
             children: [
-              Align(
-                alignment: Alignment.centerRight,
-                child: PopupMenuButton<Sorter>(
-                  icon: const Icon(Icons.filter_alt),
-                  itemBuilder: (context) => <PopupMenuEntry<Sorter>>[
-                    _sortTitle(),
-                    const PopupMenuDivider(),
-                    _sortSubmittedTime(currentSorter),
-                    _sortName(currentSorter),
-                    _sortNumberBadges(currentSorter),
-                  ],
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SelectableText(
+                    'Number participants: ${provider.participants.length}',
+                    style: CommonTextStyle.textStyleNormal.copyWith(color: Colors.black),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        tooltip: 'Reset data to origin',
+                        onPressed: () => _resetDataToOrigin(),
+                        icon: const Icon(Icons.restart_alt),
+                      ),
+                      PopupMenuButton(
+                        icon: const Icon(Icons.military_tech_rounded),
+                        tooltip: 'Top awards',
+                        itemBuilder: (context) => <PopupMenuEntry>[
+                          _topTitle(),
+                          const PopupMenuDivider(),
+                          _top2(),
+                          _top5(),
+                          _allCompletedLab(),
+                        ],
+                      ),
+                      PopupMenuButton<Sorter>(
+                        icon: const Icon(Icons.filter_alt),
+                        tooltip: 'Sort data',
+                        itemBuilder: (context) => <PopupMenuEntry<Sorter>>[
+                          _sortTitle(),
+                          const PopupMenuDivider(),
+                          _sortSubmittedTime(currentSorter),
+                          _sortName(currentSorter),
+                          _sortNumberBadges(currentSorter),
+                          _sortCompleted(currentSorter),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
               ),
               const SizedBox(height: 8.0),
               _buildTable(provider.participants),
@@ -150,6 +180,86 @@ class _FinalResultTableState extends State<FinalResultTable> {
     ),
   );
 
+  _sortCompleted(Sorter currentSorter) => PopupMenuItem<Sorter>(
+    padding: EdgeInsets.zero,
+    value: Sorter(
+      sortType: SortType.completedTime,
+      orderType: currentSorter.orderType,
+    ),
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(minWidth: 240),
+      child: ListTile(
+        mouseCursor: SystemMouseCursors.click,
+        leading: const Icon(Icons.timer_sharp),
+        trailing: _getTrailIconByOrder(
+          currentSorter: currentSorter,
+          menuSortType: SortType.completedTime,
+        ),
+        title: const Text('Completed time'),
+        onTap: () {
+          final orderType = currentSorter.sortType == SortType.completedTime
+              ? currentSorter.orderType.switchOrderType
+              : OrderType.desc;
+          final newSorter = Sorter(
+            sortType: SortType.completedTime,
+            orderType: orderType,
+          );
+          _onSelectedSort(newSorter);
+        },
+      ),
+    ),
+  );
+
+  _topTitle() => const PopupMenuItem(
+    enabled: false,
+    child: ListTile(
+      leading: Icon(Icons.military_tech_rounded),
+      title: Text('TOP AWARDS'),
+    ),
+  );
+
+  _top2() => PopupMenuItem(
+    padding: EdgeInsets.zero,
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(minWidth: 240),
+      child: ListTile(
+        mouseCursor: SystemMouseCursors.click,
+        title: const Text('Top 2 finished fastest'),
+        onTap: () {
+          _getAwards(numberParticipant: 2);
+        },
+      ),
+    ),
+  );
+
+  _top5() => PopupMenuItem(
+    padding: EdgeInsets.zero,
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(minWidth: 240),
+      child: ListTile(
+        mouseCursor: SystemMouseCursors.click,
+        title: const Text('Top 5 finished fastest'),
+        onTap: () {
+          _getAwards(numberParticipant: 5);
+        },
+      ),
+    ),
+  );
+
+  _allCompletedLab() => PopupMenuItem(
+    padding: EdgeInsets.zero,
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(minWidth: 240),
+      child: ListTile(
+        mouseCursor: SystemMouseCursors.click,
+        title: const Text('All completed lab'),
+        onTap: () {
+          _getAwards();
+        },
+      ),
+    ),
+  );
+
   _buildTable(List<Participant> participants) {
     return Container(
       decoration: BoxDecoration(
@@ -169,7 +279,7 @@ class _FinalResultTableState extends State<FinalResultTable> {
               0: FixedColumnWidth(50),
               1: FixedColumnWidth(150),
               2: FixedColumnWidth(250),
-              3: FixedColumnWidth(200),
+              3: FixedColumnWidth(150),
               4: FixedColumnWidth(300),
               5: FixedColumnWidth(150),
               6: FixedColumnWidth(400),
@@ -237,7 +347,7 @@ class _FinalResultTableState extends State<FinalResultTable> {
           TableRowItem(
             childAlignment: Alignment.centerLeft,
             child: SelectableText(
-              participant.timeStamp.toSimpleDateTime,
+              participant.timeStamp.toFullDateTime,
               style: CommonTextStyle.textStyleNormal,
             ),
           ),
@@ -299,7 +409,29 @@ class _FinalResultTableState extends State<FinalResultTable> {
   }
 
   void _onSelectedSort(Sorter sorter) {
+    if (!mounted) return;
     context.read<ParticipantProvider>().sortParticipants(sorter: sorter);
     Navigator.pop(context);
+  }
+
+  void _getAwards({int? numberParticipant}) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final dialog = Dialog(
+          elevation: 12.0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.0)),
+          child: AwardFilterWidget(topNumberToAward: numberParticipant),
+        );
+        return dialog;
+      },
+    ).then((value) {
+      Navigator.pop(context);
+    });
+  }
+
+  void _resetDataToOrigin() {
+    if (!mounted) return;
+    context.read<ParticipantProvider>().resetDataToOrigin(needNotify: true);
   }
 }

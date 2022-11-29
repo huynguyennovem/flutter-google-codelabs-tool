@@ -12,16 +12,16 @@ class Participant extends Equatable {
   @JsonKey(name: 'Timestamp')
   final DateTime timeStamp;
 
-  @JsonKey(name: 'Your email')
+  @JsonKey(name: 'Địa chỉ email đăng ký Online Codelab Challenge')
   final String email;
 
-  @JsonKey(name: 'Joined codelab')
+  @JsonKey(name: 'Chủ đề Codelab tham gia')
   final String joinedCodelab;
 
-  @JsonKey(name: 'How to get a certificate')
+  @JsonKey(name: 'Hình thức nhận Giấy chứng nhận')
   final String receiveCertMethod;
 
-  @JsonKey(name: 'Link public profile')
+  @JsonKey(name: 'Link public Profile Cloud Skill Boots')
   final String publicProfile;
 
   // These below properties will be updated when handling final result,
