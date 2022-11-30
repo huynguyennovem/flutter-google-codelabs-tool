@@ -30,7 +30,7 @@ flutter pub run build_runner build
 
 ### Demo
 
-https://user-images.githubusercontent.com/29337364/204084837-c7cd278d-9b2b-45d3-bb48-97bdba5a8b07.mp4
+https://user-images.githubusercontent.com/29337364/204867785-1c1a362b-ada9-4f14-8b68-812c2fd6fc08.mp4
 
 ### Packages & plugins
 - `flutter_adaptive_scaffold`: Adaptive layout with navigation menu (drawer, bottom bar). Using as main layout for this project
