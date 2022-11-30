@@ -34,6 +34,7 @@ class _FinalResultWidgetState extends State<FinalResultWidget> {
       if(appScriptUrlFromEnv.isNotEmpty) {
         _appScriptUrl.text = appScriptUrlFromEnv;
       }
+      _onPressStart();
     });
   }
 

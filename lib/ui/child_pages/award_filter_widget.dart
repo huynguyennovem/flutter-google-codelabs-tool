@@ -24,90 +24,101 @@ class _AwardFilterWidgetState extends State<AwardFilterWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (c, boxConstraints) {
-        return Container(
-          padding: const EdgeInsets.all(16.0),
-          width: boxConstraints.maxWidth / 3,
-          height: boxConstraints.maxHeight / 2,
-          child: Column(
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Stack',
-                  style:
-                      CommonTextStyle.textStyleNormal.copyWith(color: Colors.black, fontSize: 16.0),
-                ),
-              ),
-              ...QuestStack.values
-                  .map((stack) => RadioListTile<QuestStack>(
-                        title: Text(
-                          stack.name.toUpperCase(),
-                          style: CommonTextStyle.textStyleNormal.copyWith(fontSize: 12.0),
-                        ),
-                        value: stack,
-                        groupValue: _stack,
-                        onChanged: (QuestStack? value) {
-                          if (value != null && value != _stack) {
-                            setState(() {
-                              _stack = value;
-                            });
-                          }
-                        },
-                      ))
-                  .toList(),
-              const SizedBox(height: 12.0),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Valid codelab time',
-                  style:
-                      CommonTextStyle.textStyleNormal.copyWith(color: Colors.black, fontSize: 16.0),
-                ),
-              ),
-              ListTile(
-                title: Text(_selectedCodelabDate.getFormattedDateRange),
-                leading: const Icon(Icons.calendar_month),
-                onTap: () {
-                  _selectCodelabDate(context);
-                },
-              ),
-              const SizedBox(height: 12.0),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Valid submit time',
-                  style:
-                      CommonTextStyle.textStyleNormal.copyWith(color: Colors.black, fontSize: 16.0),
-                ),
-              ),
-              ListTile(
-                title: Text(_selectedSubmitDate.getFormattedDateRange),
-                leading: const Icon(Icons.calendar_month),
-                onTap: () {
-                  _selectSubmitDate(context);
-                },
-              ),
-              const Spacer(),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: TextButton(
-                  style: CommonButtonStyle.buttonStyleNormal,
-                  onPressed: () => _findTopAward(),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 8.0),
-                    child: Text(
-                      'Find',
-                      style: CommonTextStyle.textStyleNormal.copyWith(color: Colors.white),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      width: MediaQuery.of(context).size.width / 3,
+      child: ListView(
+        shrinkWrap: true,
+        children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Stack',
+              style: CommonTextStyle.textStyleNormal.copyWith(color: Colors.black, fontSize: 16.0),
+            ),
           ),
-        );
-      },
+          ..._buildStackChoices(),
+          const SizedBox(height: 12.0),
+          _buildCodelabTime(),
+          const SizedBox(height: 12.0),
+          _buildSubmitTime(),
+          const SizedBox(height: 12.0),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: TextButton(
+              style: CommonButtonStyle.buttonStyleNormal,
+              onPressed: () => _findTopAward(),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 8.0),
+                child: Text(
+                  'Find',
+                  style: CommonTextStyle.textStyleNormal.copyWith(color: Colors.white),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  _buildStackChoices() => QuestStack.values
+      .map((stack) => RadioListTile<QuestStack>(
+            title: Text(
+              stack.name.toUpperCase(),
+              style: CommonTextStyle.textStyleNormal.copyWith(fontSize: 12.0),
+            ),
+            value: stack,
+            groupValue: _stack,
+            onChanged: (QuestStack? value) {
+              if (value != null && value != _stack) {
+                setState(() {
+                  _stack = value;
+                });
+              }
+            },
+          ))
+      .toList();
+
+  _buildCodelabTime() {
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'Valid codelab time',
+            style: CommonTextStyle.textStyleNormal.copyWith(color: Colors.black, fontSize: 16.0),
+          ),
+        ),
+        ListTile(
+          title: Text(_selectedCodelabDate.getFormattedDateRange),
+          leading: const Icon(Icons.calendar_month),
+          onTap: () {
+            _selectCodelabDate(context);
+          },
+        ),
+      ],
+    );
+  }
+
+  _buildSubmitTime() {
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'Valid submit time',
+            style: CommonTextStyle.textStyleNormal.copyWith(color: Colors.black, fontSize: 16.0),
+          ),
+        ),
+        ListTile(
+          title: Text(_selectedSubmitDate.getFormattedDateRange),
+          leading: const Icon(Icons.calendar_month),
+          onTap: () {
+            _selectSubmitDate(context);
+          },
+        ),
+      ],
     );
   }
 
@@ -142,11 +153,11 @@ class _AwardFilterWidgetState extends State<AwardFilterWidget> {
   void _findTopAward() {
     if (!mounted) return;
     context.read<ParticipantProvider>().getAwards(
-      stack: _stack,
-      numberParticipant: widget.topNumberToAward,
-      validCodelabTime: _selectedCodelabDate,
-      validSubmitTime: _selectedSubmitDate,
-    );
+          stack: _stack,
+          numberParticipant: widget.topNumberToAward,
+          validCodelabTime: _selectedCodelabDate,
+          validSubmitTime: _selectedSubmitDate,
+        );
     Navigator.pop(context);
   }
 }

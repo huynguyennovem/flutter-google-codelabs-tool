@@ -14,7 +14,7 @@ final validQuests = List<Quest>.from(const [
   Quest('Cloud Badge 2', QuestStack.cloud),
 ]);
 
-final validCodelabStartDate = DateTime(2022, 11, 13, 23, 59);
+final validCodelabStartDate = DateTime(2022, 11, 07, 23, 59);
 final validCodelabEndDate = DateTime(2022, 11, 28, 23, 59);
 
 final validSubmitStartDate = DateTime(2022, 11, 18, 20, 50);
